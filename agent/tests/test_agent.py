@@ -29,7 +29,7 @@
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableLambda
 
 from agent import MyAgent
 from agent.myagent import graph_factory, prompt_template
@@ -54,56 +54,64 @@ class TestMyAgentLangGraph:
         assert agent.llm == mock_llm
         assert agent.verbose is True
 
-    def test_prompt_template_is_chat_prompt(self):
-        """Test that prompt_template is a ChatPromptTemplate."""
-        assert isinstance(prompt_template, ChatPromptTemplate)
+    def test_prompt_template_is_runnable(self):
+        """Test that prompt_template is a RunnableLambda (flexible input handler)."""
+        assert isinstance(prompt_template, RunnableLambda)
 
-    def test_prompt_template_has_expected_variables(self):
-        """Test that prompt_template declares chat_history and topic variables."""
-        input_vars = prompt_template.input_variables
-        assert "chat_history" in input_vars
-        assert "topic" in input_vars
+    def test_prompt_template_handles_dict_input(self):
+        """Test that prompt_template handles dict input with user_prompt_content."""
+        result = prompt_template.invoke({"user_prompt_content": "hello world"})
+        assert len(result.messages) == 1
+        assert result.messages[0].content == "hello world"
 
-    def test_prompt_template_formats_with_variables(self):
-        """Test that prompt_template can be formatted with chat_history and topic."""
-        format_kwargs = {
-            "chat_history": "User asked about AI trends.",
-            "topic": "artificial intelligence",
-        }
-        messages = prompt_template.format_messages(**format_kwargs)
-        assert len(messages) == 2
-        assert "{chat_history}" not in messages[0].content
-        assert "{topic}" not in messages[1].content
-        assert "artificial intelligence" in messages[1].content
+    def test_prompt_template_handles_string_input(self):
+        """Test that prompt_template handles plain string input."""
+        result = prompt_template.invoke("hello world")
+        assert len(result.messages) == 1
+        assert result.messages[0].content == "hello world"
 
-    @patch("agent.myagent.create_agent")
-    def test_graph_factory_creates_planner_and_writer(self, mock_create_agent):
-        """Test that graph_factory creates a graph with planner and writer nodes."""
+    def test_graph_factory_creates_multi_agent_nodes(self):
+        """Test that graph_factory creates a graph with all expected agent nodes."""
+        from langchain_core.tools import tool
+
+        @tool
+        def dummy_tool(x: str) -> str:
+            """A dummy tool."""
+            return x
+
         mock_llm = Mock()
-        mock_tool = Mock()
-        graph = graph_factory(mock_llm, [mock_tool], verbose=False)
+        mock_llm.bind_tools = Mock(return_value=mock_llm)
+        graph = graph_factory(mock_llm, [dummy_tool], verbose=False)
         assert graph is not None
-        assert "planner_node" in graph.nodes
-        assert "writer_node" in graph.nodes
+        assert "main_agent" in graph.nodes
+        assert "evaluator_agent" in graph.nodes
+        assert "knowledge_base_agent" in graph.nodes
+        assert "scheduled_job_agent" in graph.nodes
+        assert "finalizer" in graph.nodes
 
-    @patch("agent.myagent.create_agent")
-    def test_graph_factory_passes_llm_and_tools(self, mock_create_agent):
-        """Test that graph_factory passes LLM and tools to agents."""
+    def test_graph_factory_passes_llm_and_tools(self):
+        """Test that graph_factory creates the graph without error given LLM and tools."""
+        from langchain_core.tools import tool
+
+        @tool
+        def dummy_tool(x: str) -> str:
+            """A dummy tool."""
+            return x
+
         mock_llm = Mock()
-        mock_tool = Mock()
-        graph_factory(mock_llm, [mock_tool], verbose=True)
-        assert mock_create_agent.call_count == 2
-        for call in mock_create_agent.call_args_list:
-            assert call[0][0] == mock_llm
-            assert mock_tool in call[1]["tools"]
+        mock_llm.bind_tools = Mock(return_value=mock_llm)
+        graph = graph_factory(mock_llm, [dummy_tool], verbose=True)
+        assert graph is not None
 
     def test_workflow_property_uses_graph_factory(self, agent):
-        """Test that the agent's workflow property produces a graph."""
-        with patch("agent.myagent.create_agent"):
-            workflow = agent.workflow
-            assert workflow is not None
-            assert "planner_node" in workflow.nodes
-            assert "writer_node" in workflow.nodes
+        """Test that the agent's workflow property produces a graph with expected nodes."""
+        workflow = agent.workflow
+        assert workflow is not None
+        assert "main_agent" in workflow.nodes
+        assert "evaluator_agent" in workflow.nodes
+        assert "knowledge_base_agent" in workflow.nodes
+        assert "scheduled_job_agent" in workflow.nodes
+        assert "finalizer" in workflow.nodes
 
     @pytest.mark.parametrize(
         "model_value, expected_model_name",

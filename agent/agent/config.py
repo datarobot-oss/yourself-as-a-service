@@ -32,10 +32,14 @@ class Config(DataRobotAppFrameworkBaseSettings):  # type: ignore[misc]
     """
 
     llm_deployment_id: str | None = None
-    llm_default_model: str = "datarobot/azure/gpt-5-mini-2025-08-07"
+    llm_default_model: str = "datarobot/bedrock/anthropic.claude-sonnet-4-6"
     use_datarobot_llm_gateway: bool = False
     mcp_deployment_id: str | None = None
     external_mcp_url: str | None = None
+    tavily_api_key: str | None = None
+    owner_name: str = "YOUR_NAME"
+    bot_name: str = "YOUR_BOT_NAME"
+    slack_owner_user_id: str = "YOUR_SLACK_USER_ID"
     local_dev_port: int = Field(
         default=8842, validation_alias="AGENT_PORT", ge=1, le=65535
     )

@@ -1,3 +1,5 @@
+/Taskfile.yaml
+
 /Taskfile.yml
 
 # Byte-compiled / optimized / DLL files
@@ -248,3 +250,4 @@ Taskfile.gen.yaml
 .datarobot/cli/state.yaml
 
 .history/
+

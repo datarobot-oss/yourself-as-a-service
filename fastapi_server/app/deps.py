@@ -44,6 +44,8 @@ from app.repo_types import (
     MessageRepositoryLike,
     UserRepositoryLike,
 )
+from app.schedules import ScheduledJobRepository
+from app.schedules.service import SchedulerService
 from app.users.identity import IdentityRepository
 from app.users.tokens import Tokens
 from app.users.user import UserRepository
@@ -87,6 +89,8 @@ class Deps:
     db: DBCtx
     identity_repo: IdentityRepositoryLike
     message_repo: MessageRepositoryLike
+    schedule_repo: ScheduledJobRepository
+    scheduler: SchedulerService
     tokens: Tokens
     user_repo: UserRepositoryLike
     stream_manager: AGUIStreamManager[UUID, Dict[str, str]]
@@ -178,6 +182,10 @@ async def create_deps(
         config=config,
     )
 
+    schedule_repo = ScheduledJobRepository(db)
+    scheduler = SchedulerService()
+    scheduler.start()
+
     yield Deps(
         config=config,
         chat_repo=chat_repo,
@@ -189,8 +197,11 @@ async def create_deps(
         tokens=Tokens(oauth, identity_repo),
         db=db,
         stream_manager=stream_manager,
+        schedule_repo=schedule_repo,
+        scheduler=scheduler,
     )
 
     # shutdown routine
+    scheduler.shutdown()
     await oauth.close()
     await db.shutdown()

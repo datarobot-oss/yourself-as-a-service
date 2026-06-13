@@ -1,4 +1,53 @@
 root:
+  - env: OWNER_NAME
+    type: string
+    default: ""
+    optional: false
+    help: |
+      Enter your name. This is used in the agent persona (SOUL.md) and Slack messages.
+      Example: "Jane Smith"
+
+  - env: BOT_NAME
+    type: string
+    default: "YaaS"
+    optional: false
+    help: |
+      Enter the display name for the Slack bot.
+      Example: "JaneBot"
+
+  - env: SLACK_OWNER_USER_ID
+    type: string
+    default: ""
+    optional: false
+    help: |
+      Enter your Slack user ID (e.g. U01234567).
+      Find it in Slack: click your profile picture → Profile → ⋮ (More) → Copy member ID.
+
+  - env: SLACK_BOT_TOKEN
+    type: secret_string
+    default: ""
+    optional: false
+    help: |
+      Enter your Slack bot token (starts with xoxb-).
+      Found in your Slack app under OAuth & Permissions → Bot User OAuth Token.
+
+  - env: SLACK_APP_TOKEN
+    type: secret_string
+    default: ""
+    optional: false
+    help: |
+      Enter your Slack app-level token (starts with xapp-).
+      Found in your Slack app under Basic Information → App-Level Tokens.
+      Create one with the connections:write scope if it doesn't exist.
+
+  - env: TAVILY_API_KEY
+    type: secret_string
+    default: ""
+    optional: true
+    help: |
+      Enter your Tavily API key for web search in scheduled jobs (optional).
+      Get one at https://app.tavily.com
+
   - env: SESSION_SECRET_KEY
     type: secret_string
     generate: true

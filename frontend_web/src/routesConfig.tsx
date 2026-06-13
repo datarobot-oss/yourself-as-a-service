@@ -5,11 +5,13 @@ import { SettingsLayout } from './pages/SettingsLayout';
 import { ChatPage } from './pages/ChatPage';
 import { EmptyStatePage } from './pages/EmptyState.tsx';
 import { MainLayout } from './pages/MainLayoutWithChatList';
+import { SchedulePage } from './pages/SchedulePage';
 
 const OAuthCallback = lazy(() => import('./pages/OAuthCallback'));
 
 export const appRoutes = [
   { path: PATHS.OAUTH_CB, element: <OAuthCallback /> },
+  { path: PATHS.SCHEDULE, element: <SchedulePage /> },
   {
     element: <MainLayout />,
     children: [

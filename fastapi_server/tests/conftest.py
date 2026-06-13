@@ -32,6 +32,8 @@ from app.config import Config
 from app.db import DBCtx
 from app.deps import Deps, create_deps
 from app.messages import MessageRepository
+from app.schedules import ScheduledJobRepository
+from app.schedules.service import SchedulerService
 from app.users.identity import AuthSchema, Identity, IdentityCreate, IdentityRepository
 from app.users.tokens import Tokens
 from app.users.user import User, UserCreate, UserRepository
@@ -70,6 +72,8 @@ def deps(config: Config) -> Deps:
         api_key_validator=AsyncMock(spec=APIKeyValidator),
         db=AsyncMock(spec=DBCtx),
         stream_manager=AsyncMock(spec=AGUIStreamManager),
+        schedule_repo=AsyncMock(spec=ScheduledJobRepository),
+        scheduler=AsyncMock(spec=SchedulerService),
     )
     deps.identity_repo.list_by_user_id = AsyncMock(return_value=[])  # type: ignore[method-assign, union-attr]
     return deps

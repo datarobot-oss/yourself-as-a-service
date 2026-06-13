@@ -87,3 +87,39 @@
     cursor: pointer;
   }
 }
+
+/* carsongee.com terminal palette — overrides semantic tokens for both modes */
+:root,
+.dark {
+  --background: #0f090d;
+  --foreground: #b493b4;
+  --card: #2a2d32;
+  --card-foreground: #b493b4;
+  --popover: #2a2d32;
+  --popover-foreground: #b493b4;
+  --primary: #a3409d;
+  --primary-foreground: #f5eff5;
+  --secondary: #1e1520;
+  --secondary-foreground: #b493b4;
+  --muted: #1e1520;
+  --muted-foreground: #81a2be;
+  --accent: #169989;
+  --accent-foreground: #d0f5f0;
+  --destructive: #b52ead;
+  --border: #2a2d32;
+  --input: #1e1520;
+  --ring: #a3409d;
+  --chart-1: #a3409d;
+  --chart-2: #169989;
+  --chart-3: #3e6b90;
+  --chart-4: #79b2a8;
+  --chart-5: #81a2be;
+  --sidebar: #1a0f17;
+  --sidebar-foreground: #b493b4;
+  --sidebar-primary: #a3409d;
+  --sidebar-primary-foreground: #f5eff5;
+  --sidebar-accent: #2a2d32;
+  --sidebar-accent-foreground: #b493b4;
+  --sidebar-border: #2a2d32;
+  --sidebar-ring: #a3409d;
+}

@@ -4,6 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Textarea } from '@/components/ui/textarea';
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
+import { PromptTemplateSelector } from '@/components/PromptTemplateSelector';
 
 export interface ChatTextInputProps {
   onSubmit: (text: string) => Promise<unknown>;
@@ -73,6 +74,7 @@ export function ChatTextInput({
 
   return (
     <div className="relative shrink-0">
+      <PromptTemplateSelector onSelectTemplate={updateValue} disabled={runningAgent} />
       <Textarea
         ref={ref}
         data-testid="chat-message-input"
@@ -82,7 +84,7 @@ export function ChatTextInput({
         onCompositionStart={() => setIsComposing(true)}
         onCompositionEnd={() => setIsComposing(false)}
         onKeyDown={keyDownHandler}
-        className="h-auto min-h-20 flex-1 shrink-0 resize-none overflow-x-hidden overflow-y-auto pr-12"
+        className="h-auto min-h-20 flex-1 shrink-0 resize-none overflow-x-hidden overflow-y-auto pl-12 pr-12"
       />
       {runningAgent ? (
         <Tooltip>

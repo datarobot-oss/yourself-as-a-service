@@ -41,7 +41,8 @@ tasks:
       - auth-check
       - migrate
     cmds:
-      - echo "🔨 Starting development server"
+      - echo "🔨 Starting development server and Slack app"
+      - "{{.UV_CMD}} run python slack_app.py &"
       - cd ../frontend_web && task build
       - "{{.UV_CMD}} run uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload"
     env:

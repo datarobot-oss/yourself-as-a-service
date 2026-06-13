@@ -224,3 +224,6 @@ tasks:
       - echo "Saving Docker image"
       - docker save agent:latest | gzip -1 > docker_context.tar.gz
     silent: true
+  sync-knowledgebase:
+    desc: 📚 Sync knowledge base files from DataRobot into ../knowledgebase/
+    cmds: ['{{.UV_CMD}} run python sync_knowledgebase.py']

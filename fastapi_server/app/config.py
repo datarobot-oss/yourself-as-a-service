@@ -90,6 +90,17 @@ class Config(DataRobotAppFrameworkBaseSettings):
 
     application_id: str | None = None
 
+    slack_app_token: str | None = None
+    slack_bot_token: str | None = None
+    slack_owner_user_id: str = "YOUR_SLACK_USER_ID"
+    owner_name: str = "YOUR_NAME"
+    bot_name: str = "Yourself as a Service"
+
+    default_model: str = "datarobot/bedrock/anthropic.claude-sonnet-4-6"
+    llm_deployment_id: str | None = None
+    llm_default_model: str = "datarobot/bedrock/anthropic.claude-sonnet-4-6"
+    use_datarobot_llm_gateway: bool = False
+
     @property
     def application_endpoint(self) -> str:
         """Construct the application endpoint URL"""

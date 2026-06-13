@@ -36,6 +36,12 @@ from .agent import agent_app_runtime_parameters
 SESSION_SECRET_KEY: Final[str] = "SESSION_SECRET_KEY"
 session_secret_key = os.environ.get(SESSION_SECRET_KEY)
 
+SLACK_APP_TOKEN: Final[str] = "SLACK_APP_TOKEN"
+slack_app_token = os.environ.get(SLACK_APP_TOKEN)
+
+SLACK_BOT_TOKEN: Final[str] = "SLACK_BOT_TOKEN"
+slack_bot_token = os.environ.get(SLACK_BOT_TOKEN)
+
 required_key_scope_level: str = "admin"
 
 EXCLUDE_PATTERNS = [
@@ -213,6 +219,22 @@ session_secret_cred = pulumi_datarobot.ApiTokenCredential(
     ),
 )
 
+pulumi.export("SLACK_APP_TOKEN", slack_app_token)
+slack_app_token_cred = pulumi_datarobot.ApiTokenCredential(
+    f"YaaS Slack App Token [{PROJECT_NAME}]",
+    args=pulumi_datarobot.ApiTokenCredentialArgs(
+        api_token=str(slack_app_token),
+    ),
+)
+
+pulumi.export("SLACK_BOT_TOKEN", slack_bot_token)
+slack_bot_token_cred = pulumi_datarobot.ApiTokenCredential(
+    f"YaaS Slack Bot Token [{PROJECT_NAME}]",
+    args=pulumi_datarobot.ApiTokenCredentialArgs(
+        api_token=str(slack_bot_token),
+    ),
+)
+
 # Memory space is consumed by the FastAPI application (session memory), not the agent
 # deployment; expose it as Custom Application runtime parameters only.
 memory_runtime_parameters = []
@@ -272,6 +294,16 @@ fastapi_server_app_runtime_parameters: list[
             type="credential",
             key=SESSION_SECRET_KEY,
             value=session_secret_cred.id,
+        ),
+        pulumi_datarobot.ApplicationSourceRuntimeParameterValueArgs(
+            type="credential",
+            key=SLACK_APP_TOKEN,
+            value=slack_app_token_cred.id,
+        ),
+        pulumi_datarobot.ApplicationSourceRuntimeParameterValueArgs(
+            type="credential",
+            key=SLACK_BOT_TOKEN,
+            value=slack_bot_token_cred.id,
         ),
     ]
 )

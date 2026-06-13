@@ -28,6 +28,7 @@ from datarobot_pulumi_utils.pulumi.stack import PROJECT_NAME
 from datarobot_pulumi_utils.schema.exec_envs import RuntimeEnvironments
 
 from . import use_case
+from .vdb import vector_database
 from .libllm import (
     validate_feature_flags,
     verify_llm,
@@ -67,7 +68,7 @@ print("\n.   - ".join(
 ))
 """
 default_model: str = os.environ.get(
-    "LLM_DEFAULT_MODEL", "datarobot/azure/gpt-5-mini-2025-08-07"
+    "LLM_DEFAULT_MODEL", "datarobot/bedrock/anthropic.claude-sonnet-4-6"
 )
 default_llm_id: str = os.environ.get(
     "LLM_DEFAULT_LLM_ID",
@@ -94,6 +95,7 @@ llm_blueprint = datarobot.LlmBlueprint(
     resource_name="LLM Blueprint " + llm_resource_name,
     playground_id=playground.id,
     llm_id=default_llm_id,
+    vector_database_id=vector_database.id,
     llm_settings=datarobot.LlmBlueprintLlmSettingsArgs(
         max_completion_length=2048,
         temperature=0.1,

@@ -145,6 +145,7 @@ def create_app(
         try:
             async with create_deps(config, deps) as dependencies:
                 app.state.deps = dependencies
+                await dependencies.scheduler.load_jobs(dependencies.schedule_repo)
                 yield
         finally:
             otel.shutdown()
