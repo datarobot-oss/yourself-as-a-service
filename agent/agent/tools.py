@@ -26,18 +26,33 @@ def make_tavily_search_tool() -> TavilySearchResults:
 def store_to_knowledge_base(content: str, file_name: str) -> str:
     """Store text content into the DataRobot knowledge base.
 
-    Only call this tool when the user explicitly says
-    'Store this to my knowledge base:' and includes content to store.
+    Only call this tool when the user explicitly requests storing content to the knowledge base.
+
+    IMPORTANT SAFETY CONSTRAINTS FOR CALLING THIS TOOL:
+    - file_name MUST be a simple filename without path separators ('/', '\\') or relative path tokens ('..').
+    - content MUST be under 50,000 characters. If content is larger, do NOT call this tool; ask the user to truncate it.
 
     Args:
         content: The text content to store.
-        file_name: A short descriptive name for the file (without extension or date).
-            A date suffix and .txt extension will be appended automatically.
+        file_name: A short descriptive name for the file (without extension or path).
 
     Returns:
         A confirmation message with the stored file name.
     """
-    dated_name = f"{file_name}_{date.today().strftime('%Y%m%d')}.txt"
+    MAX_CONTENT_LENGTH = 50_000
+    if len(content) > MAX_CONTENT_LENGTH:
+        return f"Error: Content size ({len(content)} chars) exceeds maximum allowed limit of {MAX_CONTENT_LENGTH} characters."
+
+    import os
+    import re
+
+    # Sanitize file_name to prevent path traversal and invalid path characters
+    clean_filename = os.path.basename(file_name)
+    clean_filename = re.sub(r"[^\w\.-]", "_", clean_filename)
+    if not clean_filename or clean_filename in (".", ".."):
+        clean_filename = "stored_doc"
+
+    dated_name = f"{clean_filename}_{date.today().strftime('%Y%m%d')}.txt"
     log.info(
         "store_to_knowledge_base: uploading %s (%d bytes)", dated_name, len(content)
     )
