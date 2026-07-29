@@ -52,6 +52,20 @@ _PLACEHOLDER_MODELS = frozenset({"unknown"})
 KNOWLEDGE_BASE_TRIGGER = "Store this:"
 
 
+def _has_knowledge_base_trigger(content: str) -> bool:
+    """Return True only if KNOWLEDGE_BASE_TRIGGER appears outside backtick-quoted spans.
+
+    Strips fenced code blocks (```...```) and inline backtick spans (`...`) before
+    checking, so a trigger phrase that appears only inside a filename, code block, or
+    metadata description does not accidentally route to the knowledge base agent.
+    """
+    # Remove fenced code blocks first (``` ... ```)
+    stripped = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
+    # Remove inline backtick spans (` ... `)
+    stripped = re.sub(r"`[^`]*`", "", stripped)
+    return KNOWLEDGE_BASE_TRIGGER in stripped
+
+
 class _ScheduledJobState(MessagesState):
     search_calls: int
 
@@ -298,7 +312,7 @@ def graph_factory(
         if not content:
             log.info("route_by_content: empty content -> main_agent")
             return "main_agent"
-        if KNOWLEDGE_BASE_TRIGGER in content:
+        if _has_knowledge_base_trigger(content):
             log.info(
                 "route_by_content: knowledge base trigger detected -> knowledge_base_agent"
             )
