@@ -22,7 +22,9 @@ __all__ = [
 ]
 
 
-def create_knowledgebase_zip(knowledgebase_dir: Path = project_dir.parent / "knowledgebase") -> str:
+def create_knowledgebase_zip(
+    knowledgebase_dir: Path = project_dir.parent / "knowledgebase",
+) -> str:
     """Create a zip file of the knowledgebase folder, excluding hidden files."""
     if not knowledgebase_dir.exists():
         raise FileNotFoundError(
